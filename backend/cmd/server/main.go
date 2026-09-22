@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/edgaropechdev/sizzle-calculator/backend/internal/api"
+	"github.com/edgaropechdev/sezzle-calculator/backend/internal/api"
 )
 
 const (

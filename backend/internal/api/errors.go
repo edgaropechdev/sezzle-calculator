@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/edgaropechdev/sizzle-calculator/backend/internal/calc"
+	"github.com/edgaropechdev/sezzle-calculator/backend/internal/calc"
 )
 
 // Error codes owned by the transport layer. The rest of the codes are the

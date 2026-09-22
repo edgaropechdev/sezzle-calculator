@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/edgaropechdev/sizzle-calculator/backend/internal/calc"
+	"github.com/edgaropechdev/sezzle-calculator/backend/internal/calc"
 )
 
 // maxRequestBytes caps the body. The largest legitimate request is three short

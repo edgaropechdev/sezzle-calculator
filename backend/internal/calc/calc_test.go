@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/edgaropechdev/sizzle-calculator/backend/internal/calc"
+	"github.com/edgaropechdev/sezzle-calculator/backend/internal/calc"
 )
 
 func TestCalculate(t *testing.T) {

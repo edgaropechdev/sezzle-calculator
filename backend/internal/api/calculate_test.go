@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edgaropechdev/sizzle-calculator/backend/internal/api"
+	"github.com/edgaropechdev/sezzle-calculator/backend/internal/api"
 )
 
 // post sends body to the endpoint through the real router, so the method
