@@ -1,0 +1,7 @@
+.keypad {
+  display: grid;
+  /* Keys size themselves: two per row on a narrow phone, more as room
+     appears, without a breakpoint deciding it. */
+  grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
+  gap: 0.5rem;
+}

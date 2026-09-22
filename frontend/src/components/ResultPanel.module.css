@@ -1,0 +1,39 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  /* Fixed height across all four states: the layout below must not jump when
+     a result replaces the hint. */
+  min-height: 6.5rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, CanvasText 4%, Canvas);
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  font-size: 0.9375rem;
+  color: GrayText;
+}
+
+.expression {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: GrayText;
+}
+
+.result {
+  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: CanvasText;
+}
+
+.error {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: CanvasText;
+}
