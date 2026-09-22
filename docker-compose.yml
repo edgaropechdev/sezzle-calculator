@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      PORT: "8080"
+    # The port isn't exposed to the host machine, but it is accessible to other services in the same Docker network.
+    # This decides to not expose the backend port to the host machine, as it is only needed for internal communication between the frontend and backend services.
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+    # The frontend service depends on the backend service, ensuring that the backend is started before the frontend. 
+    # This is important because the frontend needs to communicate with the backend to function properly.
+      - backend
