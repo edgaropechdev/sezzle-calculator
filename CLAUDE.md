@@ -99,6 +99,8 @@ from both sides.
 
 ## Working rhythm
 
-Commit in real increments as work lands — the git history is the only signal the
-reviewer has about process. Do not squash the session into one commit, and do not
-manufacture a history either.
+Commit in real increments as work lands, the git history is the only signal the
+reviewer has about process.
+
+Avoid to comment every part of the code, just the necesary where we have some specific
+awarness or some specific destion.

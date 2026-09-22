@@ -1,46 +1,23 @@
-# Build context: ./frontend
-#
-# The image installs from package-lock.json and builds with Vite. What is here
-# is either rebuilt inside the image or cannot run in it.
 
-# Recipe and context filter: read by the daemon before the build, never copied.
 Dockerfile
 .dockerignore
 
-# The reason this file exists. node_modules holds binaries linked against
-# darwin/arm64 (esbuild, rollup); copied into a linux image they fail at exec.
-# `npm ci` installs the right ones. It is also the bulk of the context.
 **/node_modules
 
-# Built inside the image by `npm run build`. A dist/ from the host would be
-# copied over the fresh build, and the container would serve stale assets.
 dist
 dist-ssr
 
-# Never in an image, whatever it holds. The port is the only thing the
-# environment decides and the backend owns that; nothing here is configured
-# through a file.
 .env
 .env.*
 
-# Coverage report. The numbers ship in the README, the artefact does not.
 coverage
 
-# Logs.
 *.log
 npm-debug.log*
 
-# Editor, VCS and OS noise.
 .gitignore
 .DS_Store
 .idea/
 .vscode/
 
-# Scaffold docs: not part of a production build, and every edit would bust the
-# cache of the COPY layer underneath.
 README.md
-
-# eslint.config.js and tsconfig*.json stay in the context: `npm run build` runs
-# `tsc -b` first, so the type config is part of the build, and a lint or test
-# stage reads the rest. The test files, once they exist, stay for the same
-# reason.
