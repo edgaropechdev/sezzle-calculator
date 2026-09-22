@@ -1,0 +1,57 @@
+// Package calc implements the arithmetic. It depends on math and nothing else:
+// no transport, no serialization, no logging.
+package calc
+
+import "math"
+
+// Op is the name of an operation as it travels over the wire.
+type Op string
+
+const (
+	Add      Op = "add"
+	Subtract Op = "subtract"
+	Multiply Op = "multiply"
+	Divide   Op = "divide"
+)
+
+// operations is the single source of truth for which operations exist. Adding
+// one here is the whole change: Calculate, the unknown_operation error and
+// Operations all read from this map.
+var operations = map[Op]func(a, b float64) (float64, error){
+	Add:      func(a, b float64) (float64, error) { return a + b, nil },
+	Subtract: func(a, b float64) (float64, error) { return a - b, nil },
+	Multiply: func(a, b float64) (float64, error) { return a * b, nil },
+	Divide: func(a, b float64) (float64, error) {
+		if b == 0 {
+			return 0, ErrDivisionByZero
+		}
+		return a / b, nil
+	},
+}
+
+// Calculate applies op to a and b.
+//
+// The result is checked for finiteness before it is returned: encoding/json
+// fails on NaN and ±Inf, so an unchecked overflow would surface as a 500 on a
+// request the caller got right in every other respect. It is a domain error
+// instead, and the caller answers 400.
+//
+// No rounding happens here or anywhere else on the server: 0.1 + 0.2 is
+// 0.30000000000000004. Formatting is the client's job.
+func Calculate(op Op, a, b float64) (float64, error) {
+	apply, ok := operations[op]
+	if !ok {
+		return 0, ErrUnknownOperation
+	}
+
+	result, err := apply(a, b)
+	if err != nil {
+		return 0, err
+	}
+
+	if math.IsNaN(result) || math.IsInf(result, 0) {
+		return 0, ErrResultNotFinite
+	}
+
+	return result, nil
+}
