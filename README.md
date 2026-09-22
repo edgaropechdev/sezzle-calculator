@@ -48,6 +48,18 @@ origin and no CORS headers are needed.
 
 One endpoint: `POST /api/v1/calculate`. Through the frontend container:
 
+The different `op` options:
+
+```go
+	Add        Op = "add"
+	Subtract   Op = "subtract"
+	Multiply   Op = "multiply"
+	Divide     Op = "divide"
+	Power      Op = "power"
+	Sqrt       Op = "sqrt"
+	Percentage Op = "percentage"
+```
+
 ```bash
 curl -X POST http://localhost:3000/api/v1/calculate \
   -H 'Content-Type: application/json' \
@@ -60,3 +72,23 @@ curl -X POST http://localhost:3000/api/v1/calculate \
 
 Operations: `add`, `subtract`, `multiply`, `divide`, `power`, `sqrt`,
 `percentage`. Invalid input answers `400` with `{"error":{"code":"…","message":"…"}}`.
+
+## Design decisions
+
+**One endpoint instead of seven.** `POST /api/v1/calculate` carries the
+operation in the body, rather than exposing `/add`, `/subtract`, and so on.
+Seven routes would mean seven validation paths and seven error paths, and a
+client that grows every time an operation is added
+
+**Operands decode into `*float64`, not `float64`.** This is the single most
+important decision in the backend. With a plain `float64`, an absent field and a
+zero field both arrive as `0` and it is different than a `null` or `Infinite`.
+
+## Assumptions
+1. **`percent` means "b percent of a"**: `{"op":"percent","a":200,"b":10}`
+   returns `20`. The brief says "Percentage" without defining it.
+2. **`sqrt` takes a single operand.** `b` is neither required nor echoed back;
+   the response omits the field rather than reporting a `0` the client never
+   sent.
+3. **Unknown JSON fields are ignored, not rejected**, so a newer client can talk
+   to an older server. 
