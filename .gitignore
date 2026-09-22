@@ -1,0 +1,15 @@
+# Build artifacts
+backend/server
+frontend/node_modules/
+frontend/dist/
+
+# Coverage: the numbers ship, the generated reports do not (see README).
+backend/coverage.out
+frontend/coverage/*
+!frontend/coverage/coverage-summary.json
+
+# Raw agent session logs. PROMPTS.raw.md is generated from them; the log itself
+# carries absolute paths and unrelated context and is never committed.
+*.jsonl
+
+.DS_Store
