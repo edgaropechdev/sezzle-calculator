@@ -12,7 +12,11 @@ export type CalculatorState =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'success'; value: CalculateSuccess }
-  | { status: 'error'; code: string }
+  // The error carries the operation that was attempted, because a failed
+  // request answers with a code and nothing else: the wording for a missing
+  // field depends on how many numbers that operation reads, and only the
+  // caller still knows which one it asked for.
+  | { status: 'error'; code: string; operation: Operation }
 
 export interface Calculator {
   a: string
@@ -41,7 +45,11 @@ export function useCalculator(): Calculator {
 
       void calculate(operation, toOperand(a), toOperand(b)).then((outcome) => {
         if (id !== requestId.current) return
-        setState(outcome.ok ? { status: 'success', value: outcome.value } : { status: 'error', code: outcome.code })
+        setState(
+          outcome.ok
+            ? { status: 'success', value: outcome.value }
+            : { status: 'error', code: outcome.code, operation },
+        )
       })
     },
     [a, b],
@@ -58,6 +66,10 @@ export function useCalculator(): Calculator {
  * simply has no way to put "abc" in a numeric field, so anything that is not
  * a finite number travels as null, reaches the server as an absent operand,
  * and comes back as the server's own `missing_field` error.
+ *
+ * The second box is read for every operation, including the unary ones. What
+ * happens to it afterwards is the client's arity, not a rule applied here:
+ * `calculate` leaves it out of the body when the operation reads one number.
  */
 function toOperand(raw: string): number | null {
   const trimmed = raw.trim()

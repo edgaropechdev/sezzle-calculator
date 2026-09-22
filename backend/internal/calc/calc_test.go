@@ -29,8 +29,9 @@ func TestCalculate(t *testing.T) {
 		{name: "power of negative exponent", op: calc.Power, a: 2, b: -2, want: 0.25},
 		{name: "square root", op: calc.Sqrt, a: 9, b: 0, want: 3},
 		{name: "square root of zero", op: calc.Sqrt, a: 0, b: 0, want: 0},
-		// b is required by the request shape and unused by the operation.
-		{name: "square root ignores b", op: calc.Sqrt, a: 16, b: 999, want: 4},
+		// sqrt is Unary: the api package never asks a caller for b, and
+		// whatever reaches this far in its place takes no part in the result.
+		{name: "square root disregards b", op: calc.Sqrt, a: 16, b: 999, want: 4},
 		{name: "percentage", op: calc.Percentage, a: 10, b: 200, want: 20},
 		{name: "percentage of zero", op: calc.Percentage, a: 10, b: 0, want: 0},
 		{name: "percentage over one hundred", op: calc.Percentage, a: 150, b: 40, want: 60},
@@ -98,6 +99,46 @@ func TestEveryDeclaredOpIsWired(t *testing.T) {
 		t.Run(string(op), func(t *testing.T) {
 			if _, err := calc.Calculate(op, 1, 1); errors.Is(err, calc.ErrUnknownOperation) {
 				t.Errorf("Calculate(%q, 1, 1) reports the operation as unknown", op)
+			}
+		})
+	}
+}
+
+// Arity is what the api package validates the request against, so an operation
+// whose arity is wrong here asks callers for the wrong numbers.
+func TestArityOf(t *testing.T) {
+	cases := []struct {
+		name string
+		op   calc.Op
+		want calc.Arity
+	}{
+		{name: "add", op: calc.Add, want: calc.Binary},
+		{name: "subtract", op: calc.Subtract, want: calc.Binary},
+		{name: "multiply", op: calc.Multiply, want: calc.Binary},
+		{name: "divide", op: calc.Divide, want: calc.Binary},
+		{name: "power", op: calc.Power, want: calc.Binary},
+		{name: "square root", op: calc.Sqrt, want: calc.Unary},
+		{name: "percentage", op: calc.Percentage, want: calc.Binary},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got, ok := calc.ArityOf(c.op)
+			if !ok {
+				t.Fatalf("ArityOf(%q) reports the operation as unknown", c.op)
+			}
+			if got != c.want {
+				t.Errorf("ArityOf(%q) = %v, want %v", c.op, got, c.want)
+			}
+		})
+	}
+}
+
+func TestArityOfUnknownOperation(t *testing.T) {
+	for _, op := range []calc.Op{"modulo", ""} {
+		t.Run(string(op), func(t *testing.T) {
+			if _, ok := calc.ArityOf(op); ok {
+				t.Errorf("ArityOf(%q) reports an arity for an operation that does not exist", op)
 			}
 		})
 	}

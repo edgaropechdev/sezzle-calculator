@@ -26,11 +26,16 @@ type calculateRequest struct {
 
 // calculateResponse echoes the input next to the result, so one log line is
 // self-contained.
+//
+// B is a pointer so that it can be left out entirely. A unary operation never
+// took a second operand, and echoing one — a zero, or even the number the
+// caller happened to send — would report an operand that took no part in the
+// result. Absent is the honest answer.
 type calculateResponse struct {
-	Op     string  `json:"op"`
-	A      float64 `json:"a"`
-	B      float64 `json:"b"`
-	Result float64 `json:"result"`
+	Op     string   `json:"op"`
+	A      float64  `json:"a"`
+	B      *float64 `json:"b,omitempty"`
+	Result float64  `json:"result"`
 }
 
 func handleCalculate(w http.ResponseWriter, r *http.Request) {
@@ -42,37 +47,71 @@ func handleCalculate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if missing := firstMissingField(req); missing != "" {
-		writeError(w, http.StatusBadRequest, codeMissingField, fmt.Sprintf("field %q is required", missing))
+	if req.Op == nil {
+		writeMissingField(w, "op")
 		return
 	}
 
-	result, err := calc.Calculate(calc.Op(*req.Op), *req.A, *req.B)
+	// The operation is resolved before the operands are validated, because it
+	// is the operation that decides which operands exist. An unknown op is
+	// answered as unknown rather than as a missing b it would never have used.
+	op := calc.Op(*req.Op)
+	arity, known := calc.ArityOf(op)
+	if !known {
+		writeDomainError(w, calc.ErrUnknownOperation)
+		return
+	}
+
+	if missing := firstMissingOperand(req, arity); missing != "" {
+		writeMissingField(w, missing)
+		return
+	}
+
+	// b is zero for a unary operation, which reads a and disregards it. The
+	// arity check above is what makes that safe: a binary operation cannot
+	// reach this line without a b the caller actually sent.
+	var b float64
+	if req.B != nil {
+		b = *req.B
+	}
+
+	result, err := calc.Calculate(op, *req.A, b)
 	if err != nil {
 		writeDomainError(w, err)
 		return
 	}
 
+	var echoedB *float64
+	if arity == calc.Binary {
+		echoedB = req.B
+	}
+
 	writeJSON(w, http.StatusOK, calculateResponse{
 		Op:     *req.Op,
 		A:      *req.A,
-		B:      *req.B,
+		B:      echoedB,
 		Result: result,
 	})
 }
 
-// firstMissingField returns the name of the first required field the request
-// left out, or "" when the request is complete. It reports one field at a
-// time: the client fixes one and asks again.
-func firstMissingField(req calculateRequest) string {
+// firstMissingOperand returns the name of the first operand the operation needs
+// and the request left out, or "" when the request is complete. It reports one
+// field at a time: the caller fixes one and asks again.
+//
+// Which operands are needed is read from the arity, not hardcoded. Demanding a
+// b that the operation would then disregard is the bug this exists to prevent:
+// every operation reads a, only a binary one reads b.
+func firstMissingOperand(req calculateRequest, arity calc.Arity) string {
 	switch {
-	case req.Op == nil:
-		return "op"
 	case req.A == nil:
 		return "a"
-	case req.B == nil:
+	case arity == calc.Binary && req.B == nil:
 		return "b"
 	default:
 		return ""
 	}
+}
+
+func writeMissingField(w http.ResponseWriter, field string) {
+	writeError(w, http.StatusBadRequest, codeMissingField, fmt.Sprintf("field %q is required", field))
 }

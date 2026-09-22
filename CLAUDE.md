@@ -45,8 +45,8 @@ Error (400) — one shape for every error. Never a 500 for bad input:
 | `code` | When | HTTP |
 |---|---|---|
 | `invalid_json` | body is not valid JSON | 400 |
-| `missing_field` | `op`, `a` or `b` missing | 400 |
-| `unknown_operation` | `op` not in the list | 400 |
+| `missing_field` | `op` missing, `a` missing, or `b` missing on a **binary** operation | 400 |
+| `unknown_operation` | `op` not in the list — reported before any operand check, since an unknown operation has no known arity | 400 |
 | `division_by_zero` | `b == 0` on `divide` | 400 |
 | `negative_sqrt` | `a < 0` on `sqrt` | 400 |
 | `result_not_finite` | result is `±Inf` or `NaN` | 400 |

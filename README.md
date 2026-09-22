@@ -70,6 +70,18 @@ curl -X POST http://localhost:3000/api/v1/calculate \
 { "op": "divide", "a": 10, "b": 4, "result": 2.5 }
 ```
 
+`sqrt` reads one number, so it takes one and answers with one:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/calculate \
+  -H 'Content-Type: application/json' \
+  -d '{"op":"sqrt","a":9}'
+```
+
+```json
+{ "op": "sqrt", "a": 9, "result": 3 }
+```
+
 Operations: `add`, `subtract`, `multiply`, `divide`, `power`, `sqrt`,
 `percentage`. Invalid input answers `400` with `{"error":{"code":"…","message":"…"}}`.
 
@@ -85,10 +97,16 @@ important decision in the backend. With a plain `float64`, an absent field and a
 zero field both arrive as `0` and it is different than a `null` or `Infinite`.
 
 ## Assumptions
-1. **`percent` means "b percent of a"**: `{"op":"percent","a":200,"b":10}`
-   returns `20`. The brief says "Percentage" without defining it.
-2. **`sqrt` takes a single operand.** `b` is neither required nor echoed back;
-   the response omits the field rather than reporting a `0` the client never
-   sent.
+1. **`percentage` means "a percent of b"**: `{"op":"percentage","a":10,"b":200}`
+   returns `20`. The brief says "Percentage" without defining it. The other
+   reading — what percent `a` is of `b` — is a division, and `divide` covers it.
+2. **`sqrt` takes a single operand.** `b` is neither required nor echoed back:
+   `{"op":"sqrt","a":9}` is a complete request, and the answer omits the field
+   rather than reporting a `0` the client never sent. A `b` sent anyway is
+   disregarded, not rejected, which is assumption 3.
 3. **Unknown JSON fields are ignored, not rejected**, so a newer client can talk
-   to an older server. 
+   to an older server.
+4. **An unknown `op` is reported as unknown even when operands are missing.**
+   `{"op":"modulo","a":10}` answers `unknown_operation`, not `missing_field`:
+   until the operation is known, nothing is known about which operands it
+   needed. 

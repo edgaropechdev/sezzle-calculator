@@ -7,7 +7,7 @@
 import { messageForCode } from '../api/errorMessages.ts'
 import type { CalculatorState } from '../hooks/useCalculator.ts'
 import { formatNumber } from '../lib/formatNumber.ts'
-import { describeOperation } from './operations.ts'
+import { expressionFor } from './operations.ts'
 import styles from './ResultPanel.module.css'
 
 interface ResultPanelProps {
@@ -36,18 +36,16 @@ function renderState(state: CalculatorState) {
       return <p className={styles.hint}>Calculating…</p>
 
     case 'success': {
-      const descriptor = describeOperation(state.value.op)
+      const expression = expressionFor(state.value)
       return (
         <>
-          {descriptor && (
-            <p className={styles.expression}>{descriptor.expression(state.value.a, state.value.b)}</p>
-          )}
+          {expression && <p className={styles.expression}>{expression}</p>}
           <p className={styles.result}>{formatNumber(state.value.result)}</p>
         </>
       )
     }
 
     case 'error':
-      return <p className={styles.error}>{messageForCode(state.code)}</p>
+      return <p className={styles.error}>{messageForCode(state.code, state.operation)}</p>
   }
 }

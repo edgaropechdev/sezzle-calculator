@@ -75,6 +75,19 @@ const cases: Case[] = [
     expected: { ok: false, code: 'unexpected_response' },
   },
   {
+    // sqrt is unary: an answer without `b` is the contract, not a truncated
+    // body, and the client must not reject it the way it rejects the divide
+    // above.
+    name: 'a unary 200 without b is a success',
+    answer: () => jsonResponse({ op: 'sqrt', a: 9, result: 3 }, 200),
+    expected: { ok: true, value: { op: 'sqrt', a: 9, result: 3 } },
+  },
+  {
+    name: 'a b sent alongside a unary answer is dropped, not rejected',
+    answer: () => jsonResponse({ op: 'sqrt', a: 9, b: 999, result: 3 }, 200),
+    expected: { ok: true, value: { op: 'sqrt', a: 9, result: 3 } },
+  },
+  {
     name: 'a 200 naming an operation the client does not know is an unexpected response',
     answer: () => jsonResponse({ op: 'tetrate', a: 2, b: 3, result: 16 }, 200),
     expected: { ok: false, code: 'unexpected_response' },
@@ -111,6 +124,32 @@ describe('calculate', () => {
     expect(url).toBe(ENDPOINT)
     expect(init?.method).toBe('POST')
     expect(JSON.parse(String(init?.body))).toEqual({ op: 'add', a: 1, b: 2 })
+  })
+
+  it('leaves b out of the body entirely for a unary operation', async () => {
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(jsonResponse({ op: 'sqrt', a: 9, result: 3 }, 200)),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await calculate('sqrt', 9, 4)
+
+    // Not `b: null`, not `b: 4`: absent. A key that is present at all is a key
+    // the server would have to decide what to do with.
+    const body: unknown = JSON.parse(String(fetchMock.mock.calls[0][1]?.body))
+    expect(body).toEqual({ op: 'sqrt', a: 9 })
+  })
+
+  it('does not report a missing field when a unary operation leaves the second box empty', async () => {
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(jsonResponse({ op: 'sqrt', a: 9, result: 3 }, 200)),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const outcome = await calculate('sqrt', 9, null)
+
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ op: 'sqrt', a: 9 })
+    expect(outcome).toEqual({ ok: true, value: { op: 'sqrt', a: 9, result: 3 } })
   })
 
   it('serialises an unusable operand as null, leaving the rule to the server', async () => {

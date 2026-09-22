@@ -54,10 +54,23 @@ func TestCalculateSuccess(t *testing.T) {
 			body: `{"op":"power","a":2,"b":10}`,
 			want: map[string]any{"op": "power", "a": 2.0, "b": 10.0, "result": 1024.0},
 		},
+		// sqrt is unary: b is not required, and the answer does not invent one.
+		// The length check below is what enforces the absence — the response
+		// must carry exactly these keys.
 		{
-			name: "sqrt reads a and ignores b",
-			body: `{"op":"sqrt","a":9,"b":0}`,
-			want: map[string]any{"op": "sqrt", "a": 9.0, "b": 0.0, "result": 3.0},
+			name: "sqrt needs only a",
+			body: `{"op":"sqrt","a":9}`,
+			want: map[string]any{"op": "sqrt", "a": 9.0, "result": 3.0},
+		},
+		{
+			name: "sqrt disregards a b it was sent, and does not echo it",
+			body: `{"op":"sqrt","a":9,"b":999}`,
+			want: map[string]any{"op": "sqrt", "a": 9.0, "result": 3.0},
+		},
+		{
+			name: "a binary operation still echoes b, including a zero",
+			body: `{"op":"multiply","a":6,"b":0}`,
+			want: map[string]any{"op": "multiply", "a": 6.0, "b": 0.0, "result": 0.0},
 		},
 		{
 			name: "percentage is a percent of b",
@@ -121,9 +134,16 @@ func TestCalculateErrors(t *testing.T) {
 		{name: "b is null", body: `{"op":"divide","a":10,"b":null}`, wantCode: "missing_field"},
 
 		{name: "op is not an operation", body: `{"op":"modulo","a":10,"b":4}`, wantCode: "unknown_operation"},
+		// The operation is resolved first, so an unknown op is reported as
+		// unknown even when operands are missing: nothing is known yet about
+		// which operands it would have needed.
+		{name: "op is not an operation and b is absent", body: `{"op":"modulo","a":10}`, wantCode: "unknown_operation"},
+
 		{name: "divide by zero", body: `{"op":"divide","a":10,"b":0}`, wantCode: "division_by_zero"},
-		{name: "square root of a negative", body: `{"op":"sqrt","a":-9,"b":0}`, wantCode: "negative_sqrt"},
-		{name: "sqrt still requires b", body: `{"op":"sqrt","a":9}`, wantCode: "missing_field"},
+		{name: "square root of a negative", body: `{"op":"sqrt","a":-9}`, wantCode: "negative_sqrt"},
+		// a is required by every operation, unary ones included.
+		{name: "sqrt without a", body: `{"op":"sqrt"}`, wantCode: "missing_field"},
+		{name: "sqrt with a null a", body: `{"op":"sqrt","a":null,"b":9}`, wantCode: "missing_field"},
 		{name: "result overflows", body: `{"op":"multiply","a":1e308,"b":1e308}`, wantCode: "result_not_finite"},
 	}
 
@@ -164,6 +184,44 @@ func TestMethodNotAllowed(t *testing.T) {
 			}
 			if got := rec.Header().Get("Allow"); !strings.Contains(got, http.MethodPost) {
 				t.Errorf("Allow = %q, want it to list %s", got, http.MethodPost)
+			}
+		})
+	}
+}
+
+// The message names the field so a person reading a log knows which one to
+// fix, and the field it names has to follow the operation's arity: a unary
+// operation can only ever be missing a.
+func TestMissingFieldNamesTheField(t *testing.T) {
+	cases := []struct {
+		name      string
+		body      string
+		wantField string
+	}{
+		{name: "op", body: `{"a":1,"b":2}`, wantField: `"op"`},
+		{name: "a on a binary operation", body: `{"op":"add","b":2}`, wantField: `"a"`},
+		{name: "b on a binary operation", body: `{"op":"add","a":1}`, wantField: `"b"`},
+		{name: "a on a unary operation", body: `{"op":"sqrt"}`, wantField: `"a"`},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			rec := post(t, http.MethodPost, c.body)
+
+			var got struct {
+				Error struct {
+					Code    string `json:"code"`
+					Message string `json:"message"`
+				} `json:"error"`
+			}
+			if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+				t.Fatalf("response is not valid JSON: %v (body %s)", err, rec.Body)
+			}
+			if got.Error.Code != "missing_field" {
+				t.Fatalf("error.code = %q, want %q", got.Error.Code, "missing_field")
+			}
+			if !strings.Contains(got.Error.Message, c.wantField) {
+				t.Errorf("error.message = %q, want it to name the field %s", got.Error.Message, c.wantField)
 			}
 		})
 	}

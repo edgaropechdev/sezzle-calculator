@@ -16,6 +16,23 @@ export const OPERATIONS = [
 
 export type Operation = (typeof OPERATIONS)[number]
 
+/**
+ * The operations that read only the first number. Mirrors `Unary` in the calc
+ * package, and it is the client's single source of truth for arity: the
+ * request omits `b` for these, the response carries none, and the error text
+ * for a missing field reads differently. Declared once, three things follow.
+ */
+export const UNARY_OPERATIONS = ['sqrt'] as const satisfies readonly Operation[]
+
+export type UnaryOperation = (typeof UNARY_OPERATIONS)[number]
+export type BinaryOperation = Exclude<Operation, UnaryOperation>
+
+const UNARY = new Set<string>(UNARY_OPERATIONS)
+
+export function isUnary(operation: Operation): operation is UnaryOperation {
+  return UNARY.has(operation)
+}
+
 /** Error codes the API documents. */
 export type ApiErrorCode =
   | 'invalid_json'
@@ -32,11 +49,16 @@ export type ApiErrorCode =
  */
 export type TransportErrorCode = 'unreachable' | 'unexpected_response'
 
-/** The success body echoes the input next to the result. */
+/**
+ * The success body echoes the operands the operation took, and only those:
+ * `b` is absent for a unary operation, because the request never carried one.
+ * Optional here rather than a zero, so that "no second operand" and "a second
+ * operand that happens to be zero" stay distinguishable on this side too.
+ */
 export interface CalculateSuccess {
   op: Operation
   a: number
-  b: number
+  b?: number
   result: number
 }
 
@@ -58,6 +80,11 @@ const ENDPOINT = '/api/v1/calculate'
  * number. That is transport, not validation: null arrives at the server as an
  * absent operand and the server answers `missing_field`, which is the error
  * the user sees. No number rule is decided here.
+ *
+ * `b` is left out of the body entirely for a unary operation, whatever was
+ * typed in the second box. Sending it would be asking the server to disregard
+ * a number, and an empty box would then read as a missing field on an
+ * operation that never wanted one.
  */
 export async function calculate(
   op: Operation,
@@ -70,7 +97,7 @@ export async function calculate(
     response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ op, a, b }),
+      body: JSON.stringify(isUnary(op) ? { op, a } : { op, a, b }),
       signal,
     })
   } catch {
@@ -96,14 +123,26 @@ function readSuccess(body: unknown): CalculateSuccess | null {
   if (!isRecord(body)) return null
 
   const { op, a, b, result } = body
-  const isShaped =
-    typeof op === 'string' &&
-    typeof a === 'number' &&
-    typeof b === 'number' &&
-    typeof result === 'number' &&
-    (OPERATIONS as readonly string[]).includes(op)
+  if (
+    typeof op !== 'string' ||
+    !(OPERATIONS as readonly string[]).includes(op) ||
+    typeof a !== 'number' ||
+    typeof result !== 'number'
+  ) {
+    return null
+  }
 
-  return isShaped ? { op: op as Operation, a, b, result } : null
+  const operation = op as Operation
+
+  // A unary answer carries no second operand. One sent anyway is dropped here
+  // rather than rejected, the same way an unknown field is: a server free to
+  // add a field is the reason the client reads the shape it needs instead of
+  // demanding the shape it expects.
+  if (isUnary(operation)) {
+    return { op: operation, a, result }
+  }
+
+  return typeof b === 'number' ? { op: operation, a, b, result } : null
 }
 
 function readErrorCode(body: unknown): string | null {

@@ -13,7 +13,8 @@ export function CalculatorPage() {
           <SezzleLogo />
           <h1 className={styles.title}>Calculator</h1>
           <p className={styles.subtitle}>
-            Enter two numbers and pick an operation. Square root uses the first number.
+            Enter two numbers and pick an operation. Square root reads the first number
+            only, so the second box can stay empty for it.
           </p>
         </header>
 
