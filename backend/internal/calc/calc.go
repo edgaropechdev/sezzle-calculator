@@ -8,15 +8,23 @@ import "math"
 type Op string
 
 const (
-	Add      Op = "add"
-	Subtract Op = "subtract"
-	Multiply Op = "multiply"
-	Divide   Op = "divide"
+	Add        Op = "add"
+	Subtract   Op = "subtract"
+	Multiply   Op = "multiply"
+	Divide     Op = "divide"
+	Power      Op = "power"
+	Sqrt       Op = "sqrt"
+	Percentage Op = "percentage"
 )
 
 // operations is the single source of truth for which operations exist. Adding
 // one here is the whole change: Calculate, the unknown_operation error and
 // Operations all read from this map.
+//
+// Every operation takes both operands even when it uses one, because the
+// request shape is frozen: op, a and b are all required, and an operation that
+// silently accepted a missing b would reintroduce the absent-versus-zero bug
+// the pointer decoding exists to prevent.
 var operations = map[Op]func(a, b float64) (float64, error){
 	Add:      func(a, b float64) (float64, error) { return a + b, nil },
 	Subtract: func(a, b float64) (float64, error) { return a - b, nil },
@@ -27,6 +35,19 @@ var operations = map[Op]func(a, b float64) (float64, error){
 		}
 		return a / b, nil
 	},
+	Power: func(a, b float64) (float64, error) { return math.Pow(a, b), nil },
+	// Square root reads a and ignores b. math.Sqrt of a negative is NaN, which
+	// would surface as the generic result_not_finite; the caller gets a reason
+	// instead.
+	Sqrt: func(a, _ float64) (float64, error) {
+		if a < 0 {
+			return 0, ErrNegativeSqrt
+		}
+		return math.Sqrt(a), nil
+	},
+	// Percentage is "a percent of b": 10 and 200 is 20. The other reading —
+	// what percent a is of b — is a division, and divide already covers it.
+	Percentage: func(a, b float64) (float64, error) { return a / 100 * b, nil },
 }
 
 // Calculate applies op to a and b.

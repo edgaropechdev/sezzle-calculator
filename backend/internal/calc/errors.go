@@ -22,6 +22,10 @@ var (
 		Code:    "division_by_zero",
 		Message: "cannot divide by zero",
 	}
+	ErrNegativeSqrt = &Error{
+		Code:    "negative_sqrt",
+		Message: "cannot take the square root of a negative number",
+	}
 	ErrResultNotFinite = &Error{
 		Code:    "result_not_finite",
 		Message: "result is not a finite number",

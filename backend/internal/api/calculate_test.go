@@ -50,6 +50,21 @@ func TestCalculateSuccess(t *testing.T) {
 			want: map[string]any{"op": "multiply", "a": 6.0, "b": 7.0, "result": 42.0},
 		},
 		{
+			name: "power",
+			body: `{"op":"power","a":2,"b":10}`,
+			want: map[string]any{"op": "power", "a": 2.0, "b": 10.0, "result": 1024.0},
+		},
+		{
+			name: "sqrt reads a and ignores b",
+			body: `{"op":"sqrt","a":9,"b":0}`,
+			want: map[string]any{"op": "sqrt", "a": 9.0, "b": 0.0, "result": 3.0},
+		},
+		{
+			name: "percentage is a percent of b",
+			body: `{"op":"percentage","a":10,"b":200}`,
+			want: map[string]any{"op": "percentage", "a": 10.0, "b": 200.0, "result": 20.0},
+		},
+		{
 			name: "zero operands are values, not absences",
 			body: `{"op":"add","a":0,"b":0}`,
 			want: map[string]any{"op": "add", "a": 0.0, "b": 0.0, "result": 0.0},
@@ -107,6 +122,8 @@ func TestCalculateErrors(t *testing.T) {
 
 		{name: "op is not an operation", body: `{"op":"modulo","a":10,"b":4}`, wantCode: "unknown_operation"},
 		{name: "divide by zero", body: `{"op":"divide","a":10,"b":0}`, wantCode: "division_by_zero"},
+		{name: "square root of a negative", body: `{"op":"sqrt","a":-9,"b":0}`, wantCode: "negative_sqrt"},
+		{name: "sqrt still requires b", body: `{"op":"sqrt","a":9}`, wantCode: "missing_field"},
 		{name: "result overflows", body: `{"op":"multiply","a":1e308,"b":1e308}`, wantCode: "result_not_finite"},
 	}
 
