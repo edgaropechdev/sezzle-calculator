@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import './global.css'
 import { CalculatorPage } from './pages/CalculatorPage.tsx'
 
 const container = document.getElementById('root')

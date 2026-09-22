@@ -19,6 +19,8 @@ export function Calculator() {
 
   return (
     <div className={styles.calculator}>
+      <div className={styles.spectrum} />
+
       <ResultPanel state={state} />
 
       <div className={styles.operands}>

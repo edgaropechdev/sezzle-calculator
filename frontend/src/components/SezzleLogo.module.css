@@ -1,0 +1,6 @@
+.logo {
+  /* The header is a column: without this the image stretches to its width. */
+  align-self: flex-start;
+  width: auto;
+  height: 2rem;
+}

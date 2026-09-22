@@ -7,42 +7,42 @@
   /* Comfortable for a thumb: above the 44px minimum touch target. */
   min-height: 4rem;
   padding: 0.625rem 0.5rem;
-  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
-  border-radius: 0.625rem;
-  background: ButtonFace;
-  color: ButtonText;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--app-radius-md);
+  background: var(--sz-surface);
+  color: var(--sz-text);
   cursor: pointer;
   transition:
+    background-color 120ms ease,
     border-color 120ms ease,
     transform 80ms ease;
 }
 
 .button:hover:not(:disabled) {
-  border-color: color-mix(in oklab, CanvasText 45%, Canvas);
+  border-color: var(--sz-soft-purple);
+  background: var(--sz-bg-mint);
 }
 
 .button:active:not(:disabled) {
+  background: var(--sz-soft-green);
   transform: translateY(1px);
 }
 
-.button:focus-visible {
-  outline: 2px solid CanvasText;
-  outline-offset: 2px;
-}
-
 .button:disabled {
-  opacity: 0.45;
+  background: var(--sz-surface-sunken);
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .symbol {
   font-size: 1.25rem;
   line-height: 1;
+  color: var(--sz-accent-purple);
 }
 
 .label {
   font-size: 0.75rem;
   line-height: 1.2;
   text-align: center;
-  color: GrayText;
+  color: var(--sz-text-muted);
 }

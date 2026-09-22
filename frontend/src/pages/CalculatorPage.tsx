@@ -2,6 +2,7 @@
 // under the calculator — and delegates every interactive part to a component.
 
 import { Calculator } from '../components/Calculator.tsx'
+import { SezzleLogo } from '../components/SezzleLogo.tsx'
 import styles from './CalculatorPage.module.css'
 
 export function CalculatorPage() {
@@ -9,6 +10,7 @@ export function CalculatorPage() {
     <main className={styles.page}>
       <div className={styles.column}>
         <header className={styles.header}>
+          <SezzleLogo />
           <h1 className={styles.title}>Calculator</h1>
           <p className={styles.subtitle}>
             Enter two numbers and pick an operation. Square root uses the first number.

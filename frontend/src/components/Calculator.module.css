@@ -3,9 +3,18 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1.25rem;
-  border: 1px solid color-mix(in oklab, CanvasText 15%, Canvas);
-  border-radius: 1rem;
-  background: Canvas;
+  border-radius: var(--app-radius-lg);
+  background: var(--sz-surface);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+/* The one place the full spectrum appears. The guide sprinkles accent colour
+   rather than filling with it. */
+.spectrum {
+  height: 0.25rem;
+  margin: -1.25rem -1.25rem 0;
+  background: var(--sz-grad-spectrum);
 }
 
 .operands {
@@ -19,5 +28,9 @@
   .calculator {
     padding: 1.5rem;
     gap: 1.25rem;
+  }
+
+  .spectrum {
+    margin: -1.5rem -1.5rem 0;
   }
 }

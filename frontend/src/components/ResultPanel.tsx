@@ -16,7 +16,12 @@ interface ResultPanelProps {
 
 export function ResultPanel({ state }: ResultPanelProps) {
   return (
-    <output className={styles.panel} aria-live="polite" aria-busy={state.status === 'loading'}>
+    <output
+      className={styles.panel}
+      data-state={state.status}
+      aria-live="polite"
+      aria-busy={state.status === 'loading'}
+    >
       {renderState(state)}
     </output>
   )

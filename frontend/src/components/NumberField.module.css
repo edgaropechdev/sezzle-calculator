@@ -7,34 +7,33 @@
 
 .label {
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.02em;
-  color: GrayText;
+  color: var(--sz-text-muted);
 }
 
 .input {
   width: 100%;
   padding: 0.75rem 0.875rem;
-  border: 1px solid color-mix(in oklab, CanvasText 24%, Canvas);
-  border-radius: 0.5rem;
-  background: Field;
-  color: FieldText;
+  border: 1px solid var(--sz-border);
+  border-radius: var(--app-radius-sm);
+  background: var(--sz-surface);
+  color: var(--sz-text);
   font-size: 1.125rem;
   font-variant-numeric: tabular-nums;
   transition: border-color 120ms ease;
 }
 
 .input:hover:not(:disabled) {
-  border-color: color-mix(in oklab, CanvasText 40%, Canvas);
+  border-color: var(--sz-soft-purple);
 }
 
 .input:focus-visible {
-  outline: 2px solid CanvasText;
-  outline-offset: 1px;
-  border-color: transparent;
+  border-color: var(--sz-focus-ring);
 }
 
 .input:disabled {
-  opacity: 0.55;
+  background: var(--sz-surface-sunken);
+  opacity: 0.7;
   cursor: not-allowed;
 }

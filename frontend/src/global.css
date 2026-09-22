@@ -1,0 +1,51 @@
+/* The brand tokens are imported, not copied: assets/tokens.css stays the one
+   place a Sezzle hex is written, and everything below builds on it. Nothing
+   outside this file reaches into assets/ for a colour. */
+@import './assets/tokens.css';
+
+:root {
+  --app-radius-sm: 0.5rem;
+  --app-radius-md: 0.75rem;
+  --app-radius-lg: 1.25rem;
+
+  --app-tint-hover: color-mix(in srgb, var(--sz-accent-ink) 4%, transparent);
+  --app-tint-active: color-mix(in srgb, var(--sz-accent-ink) 8%, transparent);
+  --app-shadow: 0 1px 2px color-mix(in srgb, var(--sz-accent-ink) 6%, transparent),
+    0 10px 30px color-mix(in srgb, var(--sz-accent-ink) 8%, transparent);
+
+  /* The guide publishes one palette. Until it defines a dark treatment, the
+     page is light and says so, rather than inventing the other half. */
+  color-scheme: light;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  min-height: 100svh;
+  background: var(--sz-bg-cream);
+  color: var(--sz-text);
+}
+
+input,
+button {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sz-focus-ring);
+  outline-offset: 2px;
+}

@@ -7,33 +7,41 @@
      a result replaces the hint. */
   min-height: 6.5rem;
   padding: 1rem 1.125rem;
-  border: 1px solid color-mix(in oklab, CanvasText 18%, Canvas);
-  border-radius: 0.75rem;
-  background: color-mix(in oklab, CanvasText 4%, Canvas);
+  border: 1px solid transparent;
+  border-radius: var(--app-radius-md);
+  background: var(--sz-bg-mint);
   overflow-wrap: anywhere;
+}
+
+/* Salmon fails AA as text on a light ground — the guide's own note. It carries
+   the error as surface and border; the words stay ink. */
+.panel[data-state='error'] {
+  background: var(--sz-bg-blush);
+  border-color: var(--sz-medium-salmon);
 }
 
 .hint {
   font-size: 0.9375rem;
-  color: GrayText;
+  color: var(--sz-text-muted);
 }
 
 .expression {
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-  color: GrayText;
+  color: var(--sz-text-muted);
 }
 
 .result {
   font-size: clamp(1.75rem, 8vw, 2.5rem);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.1;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  color: CanvasText;
+  color: var(--sz-text);
 }
 
 .error {
   font-size: 0.9375rem;
-  font-weight: 500;
-  color: CanvasText;
+  font-weight: 600;
+  color: var(--sz-text);
 }
