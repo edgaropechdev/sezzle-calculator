@@ -4,7 +4,7 @@ services:
     environment:
       PORT: "8080"
     # The port isn't exposed to the host machine, but it is accessible to other services in the same Docker network.
-    # This decides to not expose the backend port to the host machine, as it is only needed for internal communication between the frontend and backend services.
+    # This decides to not expose the backend port to the host machine, as it is only needed for internal communication between the frontend and backend services to avoid conflicts.
   frontend:
     build: ./frontend
     ports:
