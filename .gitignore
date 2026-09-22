@@ -3,10 +3,11 @@ backend/server
 frontend/node_modules/
 frontend/dist/
 
-# Coverage: the numbers ship, the generated reports do not (see README).
+# Coverage: the numbers ship in the README, the generated reports do not. The
+# summary JSON is not committed either — it records absolute paths from the
+# machine that produced it, and `npm run test:coverage` rewrites it in a second.
 backend/coverage.out
-frontend/coverage/*
-!frontend/coverage/coverage-summary.json
+frontend/coverage/
 
 # Raw agent session logs. PROMPTS.raw.md is generated from them; the log itself
 # carries absolute paths and unrelated context and is never committed.
