@@ -1,8 +1,9 @@
 # Prompts — raw transcript
 
 Generated with `extract-prompts.py` across every Claude Code session for this repo.
-These are the turns a person typed, unedited. The narrative of what was
-accepted and what was rejected lives in `PROMPTS.md`.
+These are the turns a person typed, unedited — including the ones whose answer
+was thrown away. The standing instructions behind them are in `CONVENTIONS.md`
+and `CLAUDE.md`.
 
 **14 prompts, 5 sessions.**
 
