@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sezzle — sistema de diseño extraído</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 clamp(16px, 5vw, 64px) 96px;
+    font: 15px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--sz-text); background: #fff;
+  }
+  header { padding-block: 48px 32px; border-bottom: 1px solid var(--sz-border); }
+  h1 { font-size: clamp(28px, 5vw, 40px); margin: 0 0 8px; letter-spacing: -.02em; }
+  h2 { font-size: 20px; margin: 56px 0 4px; letter-spacing: -.01em; }
+  p.note { color: #6b6080; max-width: 68ch; margin: 4px 0 20px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+
+  .swatches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  .sw { border: 1px solid var(--sz-border); border-radius: 12px; overflow: hidden; }
+  .sw .chip { height: 84px; }
+  .sw .meta { padding: 10px 12px; font-size: 13px; }
+  .sw .name { font-weight: 600; }
+  .sw .hex  { font-family: ui-monospace, Menlo, monospace; color: #6b6080; }
+  .sw .cr   { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; }
+  .cr span { border-radius: 999px; padding: 2px 7px; border: 1px solid var(--sz-border); }
+  .pass { background: #E7FCF6; } .fail { background: #FEEDEC; }
+
+  .grads { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grad { height: 120px; border-radius: 12px; border: 1px solid var(--sz-border); }
+  .spectrum { height: 14px; border-radius: 999px; background: var(--sz-grad-spectrum); margin-top: 12px; }
+
+  .logos { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .logobox { border: 1px solid var(--sz-border); border-radius: 12px; padding: 28px; display: grid; place-items: center; }
+  .logobox img { width: 100%; max-width: 240px; height: auto; }
+  .on-light { background: #F7F7F8; } .on-dark { background: var(--sz-accent-ink); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--sz-border); }
+  th { font-weight: 600; color: #6b6080; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .warn { background: var(--sz-bg-blush); border-left: 3px solid var(--sz-accent-salmon);
+          padding: 14px 18px; border-radius: 0 10px 10px 0; max-width: 78ch; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sezzle — sistema de diseño extraído</h1>
+  <p class="note">
+    Origen: <code>SezzleCo-BrandingGuide_08.2025.pdf</code>, páginas 10, 27 y 28.
+    Extraído el 22-sep-2026. Los hex son los que publica la guía; los gradientes
+    y la barra de espectro están <em>medidos</em> del PDF y llevan margen.
+  </p>
+  <div class="warn">
+    <strong>Uso.</strong> La guía es «for use by integrated merchants only» y
+    prohíbe expresamente reproducir y redistribuir su contenido. La paleta puede
+    inspirar la UI; <strong>el logo no debería viajar en un repo público</strong>.
+    Ver <code>LEEME.md</code>.
+  </div>
+</header>
+
+<h2>Logo</h2>
+<p class="note">Vector, recuperado de los trazos del PDF. Fondo transparente.</p>
+<div class="logos">
+  <div class="logobox on-light"><img src="logo/svg/sezzle-logo-color-dark-text.svg" alt="Logo Sezzle full color, wordmark oscuro"></div>
+  <div class="logobox on-dark"><img src="logo/svg/sezzle-logo-color-white-text.svg" alt="Logo Sezzle full color, wordmark blanco"></div>
+  <div class="logobox on-light"><img src="logo/svg/sezzle-icon-color.svg" alt="Icono Sezzle" style="max-width:96px"></div>
+</div>
+
+<h2>Background</h2>
+<p class="note">La capa más suave. Fondo de página y separadores de secciones largas.</p>
+<div class="swatches" id="t-bg"></div>
+
+<h2>Soft</h2>
+<p class="note">La base de la marca: enmarca contenido y da equilibrio.</p>
+<div class="swatches" id="t-soft"></div>
+
+<h2>Medium</h2>
+<p class="note">Ancla saturada. Buena para fondos con peso y adornos.</p>
+<div class="swatches" id="t-medium"></div>
+
+<h2>Accent</h2>
+<p class="note">El golpe de color. La guía dice «sprinkled … used subtly».</p>
+<div class="swatches" id="t-accent"></div>
+
+<h2>Gradientes</h2>
+<p class="note">Accent → Soft, de arriba abajo. Sutiles, nunca el foco.</p>
+<div class="grads" id="grads"></div>
+<div class="spectrum" title="barra de espectro del pie de página"></div>
+
+<h2>Reglas que fija la guía</h2>
+<table>
+  <tr><th>Regla</th><th>Qué dice</th></tr>
+  <tr><td>Bloqueo</td><td>Icono y wordmark siempre juntos. Nunca uno solo.</td></tr>
+  <tr><td>Clear-space</td><td>La altura de la «e» del wordmark, en los cuatro lados. No aplica dentro de un widget de precio.</td></tr>
+  <tr><td>Variante</td><td>Full color claro o full color oscuro. El full color tiene prioridad sobre gris y sobre blanco y negro.</td></tr>
+  <tr><td>No alterar</td><td>Ni rotar, doblar, sesgar, recortar ni aislar elementos.</td></tr>
+  <tr><td>No recolorear</td><td>Ni escala de grises casera. Las versiones aprobadas están en su web.</td></tr>
+  <tr><td>No adornar</td><td>Sin sombras ni efectos.</td></tr>
+  <tr><td>Contraste</td><td>Nada de fondos que hagan el logo ilegible.</td></tr>
+  <tr><td>Paleta cerrada</td><td>«No other colors should be used … unless previously approved» (excepto foto e ilustración).</td></tr>
+</table>
+
+<script>
+const PAL = {
+  bg:     [['mint','#E7FCF6'],['cream','#FEF5ED'],['blush','#FEEDEC']],
+  soft:   [['green','#9FF4D9'],['orange','#FCD7B6'],['salmon','#F9B5B2'],['purple','#D39BD3']],
+  medium: [['green','#29D3A2'],['orange','#FEA500'],['salmon','#F98575'],['purple','#CE5DCB']],
+  accent: [['green','#00B874'],['orange','#FF8100'],['salmon','#FF5667'],['purple','#8333D4'],['ink','#382757']],
+}
+const GRADS = [
+  ['green','linear-gradient(180deg,#00B874,#9FF4D9)'],
+  ['orange','linear-gradient(180deg,#FF8100,#FCD7B6)'],
+  ['salmon','linear-gradient(180deg,#FF5667,#F9B5B2)'],
+  ['purple','linear-gradient(180deg,#8333D4,#D39BD3)'],
+  ['ink','linear-gradient(180deg,#382757,#8333D4)'],
+]
+const lum = h => {
+  const c = [1,3,5].map(i => parseInt(h.slice(i,i+2),16)/255)
+             .map(x => x <= 0.04045 ? x/12.92 : ((x+0.055)/1.055)**2.4)
+  return 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2]
+}
+const cr = (a,b) => { const [x,y]=[lum(a),lum(b)].sort((p,q)=>q-p); return (x+0.05)/(y+0.05) }
+const badge = (label, r) => {
+  const ok = r >= 4.5
+  return `<span class="${ok?'pass':'fail'}">${label} ${r.toFixed(2)}${ok?' AA':''}</span>`
+}
+for (const [tier, items] of Object.entries(PAL)) {
+  document.getElementById('t-'+tier).innerHTML = items.map(([n,h]) => `
+    <div class="sw">
+      <div class="chip" style="background:${h}"></div>
+      <div class="meta">
+        <div class="name">${tier}-${n}</div>
+        <div class="hex">${h}</div>
+        <div class="cr">${badge('sobre #FFF', cr(h,'#FFFFFF'))}${badge('sobre ink', cr(h,'#382757'))}</div>
+      </div>
+    </div>`).join('')
+}
+document.getElementById('grads').innerHTML = GRADS.map(([n,g]) => `
+  <div><div class="grad" style="background:${g}"></div>
+  <div class="hex" style="font-size:12px;margin-top:6px">${n}</div></div>`).join('')
+</script>
+</body>
+</html>

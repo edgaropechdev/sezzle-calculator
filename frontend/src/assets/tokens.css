@@ -1,0 +1,59 @@
+/* ---------------------------------------------------------------------------
+   Sezzle — design tokens
+   Extraído de SezzleCo-BrandingGuide_08.2025.pdf (pp. 10, 27, 28), 22-sep-2026.
+   Los hex son los publicados en la guía; los valores RGB que la guía imprime
+   al lado tienen dos erratas (ver LEEME.md §Erratas). El hex manda.
+   Los gradientes y el espectro están MEDIDOS del PDF, no publicados.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* — Background: la capa más suave. Fondo de página, separadores de sección — */
+  --sz-bg-mint:        #E7FCF6;
+  --sz-bg-cream:       #FEF5ED;
+  --sz-bg-blush:       #FEEDEC;
+
+  /* — Soft: la base de la marca. Enmarca contenido, aporta calma — */
+  --sz-soft-green:     #9FF4D9;
+  --sz-soft-orange:    #FCD7B6;
+  --sz-soft-salmon:    #F9B5B2;
+  --sz-soft-purple:    #D39BD3;
+
+  /* — Medium: ancla saturada. Fondos con peso y adornos — */
+  --sz-medium-green:   #29D3A2;
+  --sz-medium-orange:  #FEA500;
+  --sz-medium-salmon:  #F98575;
+  --sz-medium-purple:  #CE5DCB;
+
+  /* — Accent: el golpe de color. "Sprinkled", en la guía. Usar poco — */
+  --sz-accent-green:   #00B874;
+  --sz-accent-orange:  #FF8100;
+  --sz-accent-salmon:  #FF5667;
+  --sz-accent-purple:  #8333D4;
+  --sz-accent-ink:     #382757;  /* morado profundo: es el color del wordmark */
+
+  /* — Gradientes (accent → soft, de arriba abajo). Sutiles, nunca el foco — */
+  --sz-grad-green:   linear-gradient(180deg, #00B874 0%, #9FF4D9 100%);
+  --sz-grad-orange:  linear-gradient(180deg, #FF8100 0%, #FCD7B6 100%);
+  --sz-grad-salmon:  linear-gradient(180deg, #FF5667 0%, #F9B5B2 100%);
+  --sz-grad-purple:  linear-gradient(180deg, #8333D4 0%, #D39BD3 100%);
+  --sz-grad-ink:     linear-gradient(180deg, #382757 0%, #8333D4 100%);
+
+  /* Barra espectro (pie de cada página de la guía). Paradas medidas, ±2%. */
+  --sz-grad-spectrum: linear-gradient(90deg,
+    #29D3A2 0%, #FEA500 38%, #FF5667 63%, #8333D4 100%);
+
+  /* — Roles semánticos —
+     Derivados, no publicados por Sezzle. Los pongo porque la paleta sola no
+     dice qué usar para texto: ver la tabla de contraste en LEEME.md.
+     Regla corta: SOLO ink y accent-purple pasan AA como texto sobre blanco. */
+  --sz-text:           #382757;                    /* 13.16:1 sobre blanco */
+  --sz-text-muted:     color-mix(in srgb, #382757 65%, #FFFFFF);
+  --sz-text-on-dark:   #FFFFFF;
+  --sz-link:           #8333D4;                    /*  6.20:1 sobre blanco */
+  --sz-surface:        #FFFFFF;
+  --sz-surface-sunken: #FEF5ED;
+  --sz-border:         color-mix(in srgb, #382757 15%, #FFFFFF);
+  --sz-focus-ring:     #8333D4;
+  --sz-danger:         #FF5667;   /* fondo/borde, NO texto sobre blanco */
+  --sz-success:        #00B874;   /* idem */
+}
